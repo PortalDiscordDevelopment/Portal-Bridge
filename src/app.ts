@@ -2,11 +2,6 @@ import express, { type Request, type Response, type Express } from 'express';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
-export enum Method {
-	GET,
-	POST
-}
-
 export class HttpHandler {
 	private app: Express;
 
@@ -16,7 +11,15 @@ export class HttpHandler {
 
 	public async registerRoutes() {
 		const files = await fs.readdir(join(__dirname, 'routes'));
-		console.log(files);
+		const exports = (
+			await Promise.all(
+				files.map((f) => import(`./routes/${f.replace(/\.js/g, '')}`))
+			)
+		).map((i: { default: typeof Route }) => new (i.default.prototype.constructor.bind.apply(i.default.prototype.constructor, [null]))());
+		for (const route of exports) {
+			this.app.get(route.path, route.get)
+			this.app.post(route.path, route.get)
+		}
 	}
 
 	public startServer() {
@@ -26,7 +29,5 @@ export class HttpHandler {
 
 export abstract class Route {
 	public abstract path: string;
-
-	public async [Method.GET](req: Request, res: Response) {}
-	public async [Method.POST](req: Request, res: Response) {}
+	public async get(req: Request, res: Response) {}
 }
