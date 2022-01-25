@@ -5,11 +5,13 @@ import { Route } from '../app';
 export default class Status extends Route {
 	public override path = '/status/:bot';
 	public async get(req: Request, res: Response) {
-        const status = WebsocketHandler.connected.find(c => c.name == req.params.bot)
+		const status = [...WebsocketHandler.websocket.sockets.sockets].find(
+			(c) => c[1].data.bot == req.params.bot
+		);
 		res.send({
-            success: true,
-            online: !!status,
-            status: WebsocketHandler.connected.find(c => c.name == req.params.bot) ?? null
-        })
+			success: true,
+			online: !!status,
+			status: status ?? null
+		});
 	}
 }

@@ -1,16 +1,18 @@
 import bodyParser from 'body-parser';
 import express, { type Express } from 'express';
 import { promises as fs } from 'fs';
+import { createServer, Server } from 'http';
 import { join } from 'path';
-import { WebSocketServer } from 'ws';
-import * as config from './config'
+import * as config from './config';
 
 export class HttpHandler {
 	private app: Express;
+	public server: Server;
 
 	public constructor() {
 		this.app = express();
 		this.app.use(bodyParser.json());
+		this.server = createServer(this.app);
 	}
 
 	public async registerRoutes() {
@@ -34,14 +36,14 @@ export class HttpHandler {
 	}
 
 	public startServer() {
-		return this.app.listen(config.serverPort);
+		return this.server.listen(config.serverPort);
 	}
 }
 
 export abstract class Route {
 	public abstract path: string;
 	public app: Express;
-	public constructor(app: Express, ws: WebSocketServer) {	
+	public constructor(app: Express) {
 		this.app = app;
 	}
 }
