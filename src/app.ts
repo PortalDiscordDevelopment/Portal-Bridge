@@ -1,12 +1,16 @@
-import express, { type Request, type Response, type Express } from 'express';
+import bodyParser from 'body-parser';
+import express, { type Express } from 'express';
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { WebSocketServer } from 'ws';
+import * as config from './config'
 
 export class HttpHandler {
 	private app: Express;
 
 	public constructor() {
 		this.app = express();
+		this.app.use(bodyParser.json());
 	}
 
 	public async registerRoutes() {
@@ -15,19 +19,29 @@ export class HttpHandler {
 			await Promise.all(
 				files.map((f) => import(`./routes/${f.replace(/\.js/g, '')}`))
 			)
-		).map((i: { default: typeof Route }) => new (i.default.prototype.constructor.bind.apply(i.default.prototype.constructor, [null]))());
+		).map(
+			(i: { default: typeof Route }) =>
+				new (i.default.prototype.constructor.bind.apply(
+					i.default.prototype.constructor,
+					[null]
+				))(this.app)
+		);
 		for (const route of exports) {
-			this.app.get(route.path, route.get)
-			this.app.post(route.path, route.get)
+			if (route.get) this.app.get(route.path, route.get);
+			if (route.post) this.app.post(route.path, route.post);
+			if (route.delete) this.app.delete(route.path, route.delete);
 		}
 	}
 
 	public startServer() {
-		return this.app.listen(3000);
+		return this.app.listen(config.serverPort);
 	}
 }
 
 export abstract class Route {
 	public abstract path: string;
-	public async get(req: Request, res: Response) {}
+	public app: Express;
+	public constructor(app: Express, ws: WebSocketServer) {	
+		this.app = app;
+	}
 }

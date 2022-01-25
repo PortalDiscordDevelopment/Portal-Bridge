@@ -3,7 +3,7 @@ import { Route } from '../app';
 
 export default class Index extends Route {
 	public override path = '/';
-	public override async get(req: Request, res: Response) {
-		res.send("lmao theres nothing here")
+	public async get(req: Request, res: Response) {
+		res.send('lmao theres nothing here');
 	}
 }

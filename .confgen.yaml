@@ -1,0 +1,30 @@
+template: |
+  export const db = {
+    username: '${{username}}',
+    password: '${{password}}',
+    host: '${{host}}',
+    port: ${{port}}
+  };
+  export const serverPort = ${{webserverPort}};
+path: src/config.ts
+options:
+  - name: Database username
+    id: username
+    description: The username for the database
+  - name: Database password
+    id: password
+    description: The password for the database
+  - name: Database host
+    id: host
+    description: The host for the database
+    default: localhost
+  - name: Database port
+    id: port
+    description: The port for the database
+    type: Number
+    default: 5432
+  - name: Webserver port
+    id: webserverPort
+    description: The port for the webserver
+    type: Number
+    default: 8080

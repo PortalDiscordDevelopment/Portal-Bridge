@@ -1,13 +1,20 @@
 import { type WebSocket, WebSocketServer } from 'ws';
 import type { Server } from 'http';
+import { connected } from 'process';
 
 interface Socket extends WebSocket {
-	alive: boolean;
-	interval: NodeJS.Timer;
+	alive?: boolean;
+	interval?: NodeJS.Timer;
+	bot?: string;
+	nodeVer?: string;
 }
 
 export class WebsocketHandler {
 	private websocket: WebSocketServer;
+	public static connected: {
+		name: string;
+		nodeVer: string;
+	}[] = [];
 
 	public constructor() {
 		this.websocket = new WebSocketServer({
@@ -17,10 +24,8 @@ export class WebsocketHandler {
 
 	public async checkAlive(socket: Socket) {
 		socket.ping();
-		console.log('<== pinging');
 		return new Promise((resolve, reject) => {
 			const resolveCallback = () => {
-				console.log('==> ponged');
 				resolve(true);
 			};
 			socket.once('pong', resolveCallback);
@@ -32,26 +37,38 @@ export class WebsocketHandler {
 	}
 
 	public async initWebsocket() {
+		setInterval(() => {
+			console.log(`Connected clients:\n${[...this.websocket.clients].map((sock: Socket) => `\t${sock.bot} (NodeJS v${sock.nodeVer})`).join('\n')}`);
+		}, 5000)
 		this.websocket.on('connection', async (socket: Socket) => {
 			socket.alive = true;
+			WebsocketHandler.connected.push({
+				name: socket.bot!,
+				nodeVer: socket.nodeVer!
+			})
 			socket.interval = setInterval(async () => {
 				try {
-					const alive = await this.checkAlive(socket);
+					await this.checkAlive(socket);
 				} catch {
 					socket.alive = false;
 					socket.terminate();
-					clearInterval(socket.interval);
+					clearInterval(socket.interval!);
 				}
 			}, 5000);
-			socket.on('message', (data) => {
-				console.log(`==> ${data}`);
-			});
 		});
 	}
 
 	public async connectWebsocket(server: Server) {
 		server.on('upgrade', (request, socket, head) => {
-			this.websocket.handleUpgrade(request, socket, head, (socket) => {
+			const match = request.headers['user-agent']?.match(/PortalBot (?<name>.+) \(NodeJS v(?<node>\d+\.\d+\.\d+)\)/);
+			if (!match) {
+				socket.write('Invalid user agent');
+				socket.destroy();
+				return;
+			}
+			this.websocket.handleUpgrade(request, socket, head, (socket: Socket) => {
+				socket.bot = match.groups!.name;
+				socket.nodeVer = match.groups!.node;
 				this.websocket.emit('connection', socket, request);
 			});
 		});

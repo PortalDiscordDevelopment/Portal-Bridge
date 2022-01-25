@@ -181,3 +181,5 @@ dist
 .pnp.*
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,yarn,node
+
+src/config.ts
