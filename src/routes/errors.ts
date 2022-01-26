@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { Error } from '../models/Error';
-import { Route } from '../app';
+import { Middleware, Route } from '../app';
 
 export default class Index extends Route {
 	public override path = '/errors/:bot';
+	public override middleware = [Middleware.BEARER_AUTH, Middleware.BOT_AUTH];
 	public async get(req: Request, res: Response) {
 		res.send({
 			success: true,

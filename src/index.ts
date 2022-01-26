@@ -15,6 +15,21 @@ import { Bot } from './models/Bot';
 		port: config.db.port,
 		dialect: 'postgres'
 	});
+	Bot.init(
+		{
+			name: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				primaryKey: true
+			},
+			guildCount: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+				primaryKey: false
+			}
+		},
+		{ sequelize: db }
+	);
 	Error.init(
 		{
 			id: {
@@ -50,23 +65,15 @@ import { Bot } from './models/Bot';
 			bot: {
 				type: DataTypes.STRING,
 				allowNull: false,
-				primaryKey: false
+				primaryKey: false,
+				references: {
+					model: Bot,
+					key: 'name'
+				}
 			}
 		},
 		{ sequelize: db }
 	);
-	Bot.init({
-		name: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			primaryKey: true
-		},
-		guildCount: {
-			type: DataTypes.INTEGER,
-			allowNull: true,
-			primaryKey: false
-		}
-	}, { sequelize: db })
 	await db.sync({ alter: true });
 	await db.authenticate();
 	console.log('Initializing webserver...');

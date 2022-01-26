@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { Error } from '../models/Error';
-import { Route } from '../app';
+import { Middleware, Route } from '../app';
 
 export default class ErrorRoute extends Route {
 	public override path = '/errors/:bot/:id';
+	public override middleware = [Middleware.BEARER_AUTH, Middleware.BOT_AUTH];
 	public async get(req: Request, res: Response) {
 		const bot = req.params.bot,
 			id = req.params.id,

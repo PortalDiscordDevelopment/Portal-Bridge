@@ -6,6 +6,9 @@ template: |
     port: ${{port}}
   };
   export const serverPort = ${{webserverPort}};
+  export const clientID = '${{clientID}}';
+  export const clientSecret = '${{clientSecret}}';
+  export const adminIDs = ${{adminIDs}};
 path: src/config.ts
 options:
   - name: Database username
@@ -28,3 +31,14 @@ options:
     description: The port for the webserver
     type: Number
     default: 8080
+  - name: Application client ID
+    id: clientID
+    description: The client ID of the discord application
+    type: Number
+  - name: Application client secret
+    id: clientSecret
+    description: The client secret of the discord application
+  - name: Admin IDs
+    id: adminIDs
+    description: The IDs to give admin permissions to
+    default: "['487443883127472129']"
