@@ -2,8 +2,8 @@ import { Server } from 'socket.io';
 import type { Server as HttpServer } from 'http';
 import { Bot } from './models/Bot';
 import { generateToken } from './util';
-import got from 'got';
-import { APIUser } from 'discord-api-types';
+import { fetch } from 'undici';
+import { APIUser } from 'discord-api-types/v10';
 
 export class WebsocketHandler {
 	public static websocket: Server<ClientToServerEvents, {}, {}, SocketData>;
@@ -28,13 +28,12 @@ export class WebsocketHandler {
 			}
 			let bot: APIUser;
 			try {
-				bot = await got
-					.get('https://discord.com/api/v9/users/@me', {
-						headers: {
-							authorization: `Bot ${socket.handshake.auth.token}`
-						}
-					})
-					.json();
+				bot = (await fetch('https://discord.com/api/v10/users/@me', {
+					method: 'GET',
+					headers: {
+						Authorization: `Bot ${socket.handshake.auth.token}`
+					}
+				}).then((r) => r.json())) as APIUser;
 			} catch {
 				next(new Error('Invalid token'));
 				return;
