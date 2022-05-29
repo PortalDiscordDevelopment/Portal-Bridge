@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { APIUser } from 'discord-api-types';
+import { APIUser } from 'discord-api-types/v10';
 import express, {
 	Request,
 	RequestHandler,
@@ -8,7 +8,7 @@ import express, {
 	type Express
 } from 'express';
 import { promises as fs } from 'fs';
-import got from 'got';
+import { fetch } from 'undici';
 import { createServer, Server } from 'http';
 import { join } from 'path';
 import * as config from './config';
@@ -60,21 +60,26 @@ export class HttpHandler {
 						route.middleware.includes(Middleware.BEARER_AUTH)
 					) {
 						let user: APIUser;
-						try {
-							user = await got
-								.get('https://discord.com/api/v9/users/@me', {
-									headers: {
-										authorization: `Bearer ${match.groups!.token}`
-									}
-								})
-								.json();
-						} catch {
+
+						const response = await fetch(
+							'https://discord.com/api/v10/users/@me',
+							{
+								headers: {
+									authorization: `Bearer ${match.groups!.token}`
+								}
+							}
+						);
+
+						if (response.ok) {
+							user = (await response.json()) as APIUser;
+						} else {
 							res.status(401).send({
 								success: false,
-								error: 'Invalid discord token'
+								error: 'Invalid discord oauth token'
 							});
 							return;
 						}
+
 						if (!config.adminIDs.includes(user.id)) {
 							res.status(401).send({
 								success: false,
@@ -87,17 +92,26 @@ export class HttpHandler {
 						match.groups!.type == 'Bot' &&
 						route.middleware.includes(Middleware.BOT_AUTH)
 					) {
-						const socket = [
-							...WebsocketHandler.websocket.sockets.sockets.values()
-						].find((s) => s.data.apiToken == match.groups!.token);
-						if (!socket) {
+						let user: APIUser;
+
+						const response = await fetch(
+							'https://discord.com/api/v10/users/@me',
+							{
+								headers: {
+									authorization: `Bot ${match.groups!.token}`
+								}
+							}
+						);
+
+						if (response.ok) {
+							user = (await response.json()) as APIUser;
+						} else {
 							res.status(401).send({
 								success: false,
-								error: 'Invalid api token'
+								error: 'Invalid discord bot token'
 							});
 							return;
 						}
-						next();
 					}
 					next();
 				}

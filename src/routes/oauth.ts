@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Route } from '../app';
-import got, { HTTPError } from 'got';
+import { fetch, FormData } from 'undici';
 import * as config from '../config';
-import { RESTPostOAuth2AccessTokenResult } from 'discord-api-types';
+import { RESTPostOAuth2AccessTokenResult } from 'discord-api-types/v10';
 
 export default class Oauth2 extends Route {
 	public override path = '/oauth/callback';
@@ -16,27 +16,43 @@ export default class Oauth2 extends Route {
 			});
 			return;
 		}
-		const uri = `${req.protocol}://${req.get('host')}/oauth/callback`;
-		try {
-			const oauthResponse: RESTPostOAuth2AccessTokenResult = await got
-				.post('https://discord.com/api/v9/oauth2/token', {
-					form: {
-						client_id: config.clientID,
-						client_secret: config.clientSecret,
-						grant_type: 'authorization_code',
-						code,
-						redirect_uri: uri
-					}
-				})
-				.json();
-			res.header('authorization', `Bearer ${oauthResponse.access_token}`);
-			res.send(oauthResponse);
-		} catch (e) {
+
+		// Construct form data for the oauth request
+		const body = new FormData();
+		body.append('client_id', config.clientID);
+		body.append('client_secret', config.clientSecret);
+		body.append('grant_type', 'authorization_code');
+		body.append('code', code);
+		body.append(
+			'redirect_uri',
+			`${req.protocol}://${req.get('host')}/oauth/callback`
+		);
+
+		// Make request
+		const oauthResponse = await fetch(
+			'https://discord.com/api/v10/oauth2/token',
+			{
+				method: 'POST',
+				body,
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			}
+		);
+
+		if (oauthResponse.ok) {
+			// Respond with discord's response if successful
+			const response =
+				(await oauthResponse.json()) as RESTPostOAuth2AccessTokenResult;
+			res.header('authorization', `Bearer ${response.access_token}`);
+			res.send(response);
+		} else {
+			// Respond with error if the request was not successful
 			res.status(500);
 			res.send({
 				success: false,
 				error: 'Internal discord error',
-				errorData: (e as HTTPError).response.body
+				errorData: await oauthResponse.json()
 			});
 		}
 	}

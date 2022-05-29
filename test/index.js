@@ -1,39 +1,45 @@
-const got = require('got');
-const io = require('socket.io-client');
+// Imports
+const { fetch } = require('undici');
+const { io } = require('socket.io-client');
 const config = require('./config');
+
+// Construct socket.io instance
 const sock = io(config.apiURI + '/', {
-	extraHeaders: {
-		'User-Agent': `PortalBot YourApps-TS (NodeJS ${process.version})`
-	},
 	auth: {
-		token: config.token
+		token: config.token,
+		name: 'YourApps',
+		platform: 'NodeJS',
+		platformVersion: process.version
 	},
 	rejectUnauthorized: false
 });
-const emitPromise = (sock, event) => new Promise((resolve, reject) => {
-		sock.emit(event, (data) => {
-			resolve(data);
-		});
-		setTimeout(() => reject(new Error('Emitpromise Timeout')), 5000);
-	});
+
+sock.on('query');
+
+// Add handler for once the socket connects
 sock.on('connect', async () => {
-	console.log('connected');
+	console.log('Connected to socket server');
+
+	// Generate and send a random guild count
 	const n = Math.floor(Math.random() * (1000 - 20) + 20);
 	console.log(`Emitting guild count (${n})`);
 	sock.emit('guildCount', n);
-	console.log('Requesting token for api calls');
-	const token = await emitPromise(sock, 'getToken');
-	console.log(`Recieved token ${token}`);
-	console.log('Fetching status with bot token in 5s');
-	await new Promise(r => setTimeout(r, 5000));
-	console.log(
-		await got.get(`${config.apiURI}/status/YourApps-TS`, {
-			headers: {
-				Authorization: `Bot ${token}`
-			}
-		}).json()
-	)
+
+	// Use discord bot token to fetch own status 3 times
+	for (let i = 0; i < 3; i++) {
+		console.log('Fetching status with bot token in 2s');
+		await new Promise((r) => setTimeout(r, 2000));
+		console.log(
+			await fetch(`${config.apiURI}/status/YourApps`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bot ${config.token}`
+				}
+			}).then((r) => r.json())
+		);
+	}
 });
+
 sock.on('connect_error', (e) => {
 	console.error(e);
 });
