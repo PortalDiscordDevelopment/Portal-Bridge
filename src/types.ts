@@ -1,13 +1,15 @@
-interface ClientToServerEvents {
+export interface ClientToServerEvents {
 	guildCount: (count: number) => void;
 	getToken: (respond: (token: string) => void) => void;
 }
 
-interface SocketData {
-	bot: string;
-	nodeVer: string;
-	userAgent: string;
+export interface SocketHandshakeData {
 	token: string;
-	apiToken: string;
+	name: string;
+	platform: string;
+	platformVersion: string;
+}
+
+export interface SocketData extends SocketHandshakeData {
 	connectedAt: Date;
 }

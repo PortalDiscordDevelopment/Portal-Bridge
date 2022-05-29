@@ -2,11 +2,11 @@
 	"name": "portal-bridge",
 	"license": "OSL-3.0",
 	"scripts": {
-		"start": "yarn build && node -r source-map-support/register dist/index.js",
+		"start": "yarn build && node --enable-source-maps dist/index.js",
 		"build": "yarn tsc",
 		"format": "yarn prettier . --write",
 		"lint": "yarn eslint .",
-		"watch": "yarn build --watch & yarn nodemon -q -w dist -i src --exec 'node -r source-map-support/register' dist/index.js"
+		"watch": "yarn build --watch & yarn nodemon -q -w dist -i src --exec 'node --enable-source-maps' dist/index.js"
 	},
 	"packageManager": "yarn@3.2.1",
 	"devDependencies": {
@@ -23,10 +23,11 @@
 		"nodemon": "^2.0.16",
 		"prettier": "^2.6.2",
 		"socket.io-client": "^4.5.1",
-		"source-map-support": "^0.5.21",
 		"typescript": "^4.7.2"
 	},
 	"dependencies": {
+		"@sapphire/result": "^1.1.1",
+		"@sapphire/shapeshift": "^3.0.0",
 		"body-parser": "^1.20.0",
 		"cookie-parser": "^1.4.6",
 		"express": "^4.18.1",

@@ -94,6 +94,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sapphire/result@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@sapphire/result@npm:1.1.1"
+  checksum: ccb3fcd051523f439c5f9871a251273e10ffeebcb5d6817c1c7efb24b60d8866fd5a781e0c77fe15a66a2dd5c5831b00258e70c76b6a82bb43bb150e10598767
+  languageName: node
+  linkType: hard
+
+"@sapphire/shapeshift@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@sapphire/shapeshift@npm:3.0.0"
+  checksum: f5ebf3991a2bb6e80242b58a488343f25147ba79e8ac227e3d26cbed3402e7e06c326eb9afddd5804be3b0a4e714366c7e60842d2072395da2cb6e754d28bda7
+  languageName: node
+  linkType: hard
+
 "@sindresorhus/is@npm:^0.14.0":
   version: 0.14.0
   resolution: "@sindresorhus/is@npm:0.14.0"
@@ -657,13 +671,6 @@ __metadata:
   dependencies:
     fill-range: ^7.0.1
   checksum: e2a8e769a863f3d4ee887b5fe21f63193a891c68b612ddb4b68d82d1b5f3ff9073af066c343e9867a393fe4c2555dcb33e89b937195feb9c1613d259edfcd459
-  languageName: node
-  linkType: hard
-
-"buffer-from@npm:^1.0.0":
-  version: 1.1.2
-  resolution: "buffer-from@npm:1.1.2"
-  checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
   languageName: node
   linkType: hard
 
@@ -2711,6 +2718,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "portal-bridge@workspace:."
   dependencies:
+    "@sapphire/result": ^1.1.1
+    "@sapphire/shapeshift": ^3.0.0
     "@types/body-parser": ^1.19.2
     "@types/cookie-parser": ^1.4.3
     "@types/express": ^4.17.13
@@ -2732,7 +2741,6 @@ __metadata:
     sequelize: ^6.20.1
     socket.io: ^4.5.1
     socket.io-client: ^4.5.1
-    source-map-support: ^0.5.21
     typescript: ^4.7.2
     undici: ^5.3.0
   languageName: unknown
@@ -3280,23 +3288,6 @@ __metadata:
     ip: ^1.1.5
     smart-buffer: ^4.1.0
   checksum: 2ca9d616e424f645838ebaabb04f85d94ea999e0f8393dc07f86c435af22ed88cb83958feeabd1bb7bc537c635ed47454255635502c6808a6df61af1f41af750
-  languageName: node
-  linkType: hard
-
-"source-map-support@npm:^0.5.21":
-  version: 0.5.21
-  resolution: "source-map-support@npm:0.5.21"
-  dependencies:
-    buffer-from: ^1.0.0
-    source-map: ^0.6.0
-  checksum: 43e98d700d79af1d36f859bdb7318e601dfc918c7ba2e98456118ebc4c4872b327773e5a1df09b0524e9e5063bb18f0934538eace60cca2710d1fa687645d137
-  languageName: node
-  linkType: hard
-
-"source-map@npm:^0.6.0":
-  version: 0.6.1
-  resolution: "source-map@npm:0.6.1"
-  checksum: 59ce8640cf3f3124f64ac289012c2b8bd377c238e316fb323ea22fbfe83da07d81e000071d7242cad7a23cd91c7de98e4df8830ec3f133cb6133a5f6e9f67bc2
   languageName: node
   linkType: hard
 
