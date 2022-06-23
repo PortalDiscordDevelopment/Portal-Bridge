@@ -1,0 +1,20 @@
+services:
+    bot:
+      image: portal-bridge:latest
+      restart: always
+      depends_on:
+        postgresql:
+          condition: service_healthy
+    postgresql:
+      image: postgres:latest
+      restart: always
+      environment:
+        POSTGRES_USER: bridge
+        POSTGRES_PASSWORD: bridge
+        POSTGRES_DB: bridge
+      healthcheck:
+          test: PGUSER=bridge pg_isready
+          interval: 5s
+          timeout: 3s
+          retries: 5
+          start_period: 5s

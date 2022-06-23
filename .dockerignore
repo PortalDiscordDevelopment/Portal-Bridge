@@ -1,0 +1,10 @@
+.git
+.github
+.confgen.yaml
+.gitignore
+.gitpod.*
+.prettier*
+.vscode
+LICENSE
+*.md
+test

@@ -1,12 +1,18 @@
 {
 	"name": "portal-bridge",
 	"license": "OSL-3.0",
+	"version": "1.0.0",
 	"scripts": {
-		"start": "yarn build && node --enable-source-maps dist/index.js",
+		"start": "yarn build && yarn start:raw",
+		"start:raw": "node --enable-source-maps dist/index.js",
 		"build": "yarn tsc",
 		"format": "yarn prettier . --write",
 		"lint": "yarn eslint .",
-		"watch": "yarn build --watch & yarn nodemon -q -w dist -i src --exec 'node --enable-source-maps' dist/index.js"
+		"watch": "yarn build --watch & yarn nodemon -q -w dist -i src --exec 'node --enable-source-maps' dist/index.js",
+		"version": "node -e \"console.log(require('./package.json').version)\"",
+		"docker:build": "docker build -t portal-bridge:latest -t \"portal-bridge:$(yarn version)\" .",
+		"docker:up": "docker compose up",
+		"docker:start": "yarn docker:build && yarn docker:up"
 	},
 	"packageManager": "yarn@3.2.1",
 	"devDependencies": {
